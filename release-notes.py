@@ -17,6 +17,10 @@ pull_request_url = f'{server}/{project}/_git/{repository_id}/pullrequest'
 # Personal Access Token (PAT)
 personal_access_token = os.environ.get('PERSONAL_ACCESS_TOKEN')
 
+#Branch filter
+branch_filter = 'feature/sys.fieldbus'
+
+
 # Function to run git commands
 def run_git_command(cmd):
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -97,11 +101,10 @@ def get_pr_info(pr_id):
 # Print PR info
 def print_pr_info(pr):
     print(f'\n[PR {pr["pullRequestId"]}]({pull_request_url}/{pr["pullRequestId"]}), {pr["title"]}')
-    
-
+   
 # Main logic
 def main():
-    tag = 'mfd_1.1.2..mfd_1.1.3'
+    tag = 'mfd_1.1.7..mfd_1.1.8'
     
     # Get list of commit messages for the tag
     commits = get_commits_for_tag(tag)
@@ -118,8 +121,12 @@ def main():
     for pr_id, work_items in pr_work_items.items():
         # Print PR work item information  - title etc. and make it a link in markdown
         pr = get_pr_info(pr_id);
-        print_pr_info(pr);
 
+        # Filtering to specic branch feature/sys.fieldbus
+        if (branch_filter != "") and (branch_filter not in pr["sourceRefName"]):
+            continue
+
+        print_pr_info(pr);
         # Get the list of workitems linked to the PR 
         work_items_list = work_items["value"]
         for work_item in work_items_list:
