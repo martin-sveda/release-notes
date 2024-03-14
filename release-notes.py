@@ -6,18 +6,16 @@ import base64
 import json
 
 
-
 # Azure DevOps Details
-server = 'jupiter.tfs.siemens.net/tfs'
-
-
-
+server = 'https://jupiter.tfs.siemens.net/tfs'
 project = 'IPS/IO-Systems'
 repository_id = 'et200.imck.device'
+api_base_url = f'{server}/{project}/_apis'
+work_item_url = f'{server}/{project}/_workitems/edit'
+pull_request_url = f'{server}/{project}/_git/{repository_id}/pullrequest'
+
+# Personal Access Token (PAT)
 personal_access_token = os.environ.get('PERSONAL_ACCESS_TOKEN')
-
-
-api_base_url = f'https://{server}/{project}/_apis'
 
 # Function to run git commands
 def run_git_command(cmd):
@@ -49,14 +47,19 @@ def make_devops_api_call(api_endpoint, method='GET'):
 
 # Function to get commits for a tag
 def get_commits_for_tag(tag):
-   
-    #change to desired directory - hardcoded for now
+    # Get the current directory
+    current_dir = os.getcwd()
+    
+    #change to desired directory - hardcoded for now                !!!!!!!!
     os.chdir('..//et200.imck.device')
     current_dir = os.getcwd()
-    print('Current directory: ' + current_dir)
     
     #run the git command
+    print(f'Getting commits for tag {tag}')
     cmd = ['git', 'log', f'{tag}', '--pretty=format:%H %s']
+
+    # Change the dir back
+    os.chdir(current_dir)
 
     return run_git_command(cmd).split('\n')
 
@@ -84,8 +87,7 @@ def get_work_item_info(work_item_id):
 
 # Print work item information
 def print_work_item_info(work_item):
-    print(f' - [{work_item["id"]}]({work_item["url"]}), {work_item["fields"]["System.WorkItemType"]}, {work_item["fields"]["System.Title"]}')
-
+    print(f' - [{work_item["id"]}]({work_item_url}/{work_item["id"]}), {work_item["fields"]["System.WorkItemType"]}, {work_item["fields"]["System.Title"]}')
 
 # Get PR info
 def get_pr_info(pr_id):
@@ -94,15 +96,13 @@ def get_pr_info(pr_id):
 
 # Print PR info
 def print_pr_info(pr):
-    print(f'\n[PR {pr["pullRequestId"]}]({pr["url"]}), {pr["title"]}')
-
-
+    print(f'\n[PR {pr["pullRequestId"]}]({pull_request_url}/{pr["pullRequestId"]}), {pr["title"]}')
+    
 
 # Main logic
 def main():
-    tag = 'mfd_1.1.3..mfd_1.1.4'
-    commit_cnt = 0
-
+    tag = 'mfd_1.1.7..mfd_1.1.8'
+    
     # Get list of commit messages for the tag
     commits = get_commits_for_tag(tag)
     
