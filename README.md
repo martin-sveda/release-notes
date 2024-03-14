@@ -24,6 +24,9 @@ PR 22457 {message}
 # Things to consider
 
 1. Make a FileWriter class so it can output to stdout or specific file
-2. Consider filtering PR just from specified branch (to list only the PR done by specific team)
+2. Consider filtering PR just from specified branch (to list only the PR done by specific team) through
+   argument
+3. Anything else
+
 
 

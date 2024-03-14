@@ -3,8 +3,6 @@ import requests
 import os
 import re
 import base64
-import json
-
 
 # Azure DevOps Details
 server = 'https://jupiter.tfs.siemens.net/tfs'
@@ -137,4 +135,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-
+# End of file
+    
