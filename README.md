@@ -21,4 +21,9 @@ PR 22457 {message}
  - {Id as link} {Type} {Name}
 
 
+# Things to consider
+
+1. Make a FileWriter class so it can output to stdout or specific file
+2. Consider filtering PR just from specified branch (to list only the PR done by specific team)
+
 

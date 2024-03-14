@@ -101,7 +101,7 @@ def print_pr_info(pr):
 
 # Main logic
 def main():
-    tag = 'mfd_1.1.7..mfd_1.1.8'
+    tag = 'mfd_1.1.2..mfd_1.1.3'
     
     # Get list of commit messages for the tag
     commits = get_commits_for_tag(tag)
