@@ -10,6 +10,8 @@ import json
 # Azure DevOps Details
 server = 'jupiter.tfs.siemens.net/tfs'
 
+
+
 project = 'IPS/IO-Systems'
 repository_id = 'et200.imck.device'
 personal_access_token = os.environ.get('PERSONAL_ACCESS_TOKEN')
@@ -79,20 +81,29 @@ def get_work_item_info(work_item_id):
     api_endpoint = f'{api_base_url}/wit/workitems/{work_item_id}'
     return make_devops_api_call(api_endpoint)
 
+
 # Print work item information
 def print_work_item_info(work_item):
-    print(f'  Work Item: {work_item["id"]}, {work_item["url"]}')
-    print(f'    Title: {work_item["fields"]["System.Title"]}')
-    print(f'    Type: {work_item["fields"]["System.WorkItemType"]}')
-    print(f'    State: {work_item["fields"]["System.State"]}')
-    print(f'    Assigned To: {work_item ["fields"]["System.AssignedTo"]}')
+    print(f' - [{work_item["id"]}]({work_item["url"]}), {work_item["fields"]["System.WorkItemType"]}, {work_item["fields"]["System.Title"]}')
 
-    
+
+# Get PR info
+def get_pr_info(pr_id):
+    api_endpoint = f'{api_base_url}/git/repositories/{repository_id}/pullRequests/{pr_id}'
+    return make_devops_api_call(api_endpoint)
+
+# Print PR info
+def print_pr_info(pr):
+    print(f'\n[PR {pr["pullRequestId"]}]({pr["url"]}), {pr["title"]}')
+
+
+
 # Main logic
 def main():
     tag = 'mfd_1.1.3..mfd_1.1.4'
     commit_cnt = 0
 
+    # Get list of commit messages for the tag
     commits = get_commits_for_tag(tag)
     
     pr_work_items = {}
@@ -100,20 +111,20 @@ def main():
         commit_hash, commit_message = commit.split(' ', 1)
         pr_id = extract_pr_id(commit_message)
         if pr_id:
-            #print('PR ID = ' + pr_id)
             work_items = get_work_items_for_pr(pr_id)
             pr_work_items[pr_id] = work_items
-            commit_cnt += 1
+        
     
-    print(f'Commits: {commit_cnt}' )
-
     for pr_id, work_items in pr_work_items.items():
-        print(f'PR: {pr_id}')
-        print(f'  Count of related work items: ', {work_items["count"]})
-        work_items_list = work_items["value"];
-        for work_item in work_items_list:
-            print(f'  Work Item: {work_item["id"]}, {work_item["url"]}')
+        # Print PR work item information  - title etc. and make it a link in markdown
+        pr = get_pr_info(pr_id);
+        print_pr_info(pr);
 
+        # Get the list of workitems linked to the PR 
+        work_items_list = work_items["value"]
+        for work_item in work_items_list:
+            wi = get_work_item_info(work_item["id"]);
+            print_work_item_info(wi)
 
 
 if __name__ == "__main__":
