@@ -48,12 +48,14 @@ def make_devops_api_call(api_endpoint, method='GET'):
 # Function to get commits for a tag
 def get_commits_for_tag(tag):
    
+    #change to desired directory - hardcoded for now
     os.chdir('..//et200.imck.device')
     current_dir = os.getcwd()
     print('Current directory: ' + current_dir)
     
+    #run the git command
     cmd = ['git', 'log', f'{tag}', '--pretty=format:%H %s']
-    #print(cmd)
+
     return run_git_command(cmd).split('\n')
 
 
@@ -63,7 +65,6 @@ def extract_pr_id(commit_message):
     if match:
         return match.group(1)
     return None
-    
     pass
 
 
@@ -73,6 +74,20 @@ def get_work_items_for_pr(pr_id):
     return make_devops_api_call(api_endpoint)
 
 
+# Function to get work item information
+def get_work_item_info(work_item_id):
+    api_endpoint = f'{api_base_url}/wit/workitems/{work_item_id}'
+    return make_devops_api_call(api_endpoint)
+
+# Print work item information
+def print_work_item_info(work_item):
+    print(f'  Work Item: {work_item["id"]}, {work_item["url"]}')
+    print(f'    Title: {work_item["fields"]["System.Title"]}')
+    print(f'    Type: {work_item["fields"]["System.WorkItemType"]}')
+    print(f'    State: {work_item["fields"]["System.State"]}')
+    print(f'    Assigned To: {work_item ["fields"]["System.AssignedTo"]}')
+
+    
 # Main logic
 def main():
     tag = 'mfd_1.1.3..mfd_1.1.4'
